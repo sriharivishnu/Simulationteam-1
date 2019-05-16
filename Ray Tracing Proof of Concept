@@ -1,0 +1,32 @@
+import pygame,pygame.gfxdraw,random
+pygame.init()
+screen = pygame.display.set_mode([800, 800])
+center=(300,400)
+temp1=center[0]
+temp2=center[1]
+clock = pygame.time.Clock()
+while True:
+    pointlist = [center]
+    screen.fill((255,255,255))
+    for x in range(-60,61,10):
+        currentposx = center[0]
+        currentposy=center[1]
+        vx = ((center[0]+x)- center[0]) / 100  # get velocity of swap
+        vy = ((center[1]-200) - center[1]) / 100
+        for y in range (31):
+            currentposx+=vx*y
+            currentposy += vy * y
+            screen.fill((0,0,0))
+            bruh=pygame.draw.rect(screen, (255, 0, 0), [400 - 100, 50, 100, 100])
+            bruh1 = pygame.draw.rect(screen, (255, 0, 0), [300, 200, 20, 20])
+            jot=pygame.draw.rect(screen, (0, 0, 0), [currentposx,currentposy, 4, 4])
+            if bruh.colliderect(jot) or bruh1.colliderect(jot):
+                pointlist.append((currentposx, currentposy))
+                break
+            elif y==30 or currentposx<=0 or currentposx>=800 or currentposy<=0 or currentposy>=800:
+                pointlist.append((currentposx,currentposy))
+    pygame.gfxdraw.filled_polygon(screen,pointlist,(255,255,0))
+    pygame.display.flip()
+    temp1+=10
+    center=((temp1,temp2))
+    clock.tick(600)
