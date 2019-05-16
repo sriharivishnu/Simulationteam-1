@@ -1,0 +1,18 @@
+import pygame,pygame.gfxdraw,random,math
+pygame.init()
+screen = pygame.display.set_mode([800, 800])
+center=(300,400)
+targetdist=50
+targetangle=50
+clock = pygame.time.Clock()
+while True:
+  for x in range(-60,61):
+    currenttargetangle=targetangle+x
+    targetposy=math.sin(currenttargetangle)*targetdist
+    targetposx=math.cos(currenttargetangle)*targetdist
+    for y in range(targetdist):
+      
+      
+    pygame.gfxdraw.filled_polygon(screen,pointlist,(255,255,0))
+    
+    clock.tick(600)
