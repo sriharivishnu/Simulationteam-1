@@ -1,60 +1,73 @@
 import pygame
-#Constructing player class and driver code. Will delete driver code once done
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = Surface
-        self.rect = [x,y,100,100]
+        self.image = pygame.Surface([100,100], pygame.SRCALPHA)
+        pygame.draw.rect(self.image, (200,200,69), [0,0,100,100])
+        self.rect = self.image.get_rect()
+        self.rect.center = [x,y]
         self.x_change = 0
         self.y_change = 0
         self.x = x
         self.y = y
 
+    def right(self):
+        self.x_change = 5
+    def up(self):
+        self.y_change = -5
+    def left(self):
+        self.x_change = -5
+    def down(self):
+        self.y_change = 5
+
+
     def update(self, *args):
         self.x += self.x_change
         self.y += self.y_change
-        pygame.draw.rect()
+        self.rect = self.image.get_rect()
+        self.rect.center = [self.x, self.y]
+
 pygame.init()
 display_size_x = 1000
 display_size_y = 700
 gameDisplay = pygame.display.set_mode((display_size_x, display_size_y))
 pygame.display.set_caption("SRIHARI VISHNU")
 
+sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
 crashed = False
-def display_person(x,y,width,height):
-    pygame.draw.rect(gameDisplay, (200,200,69), [x,y,x+width, y+height])
-def check(x,y):
-    if x > 0 and y > 0 and x < display_size_x-150 and y < display_size_y-130:
-        return True
-    return False
+
 x = display_size_x/2-75
 y = display_size_y/2-65
-right = False
-left = False
-x_change = 0
+player = Player(x,y)
+sprites.add(player)
+
 while not crashed:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             crashed = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                x_change = -5
+                player.left()
             if event.key == pygame.K_RIGHT:
-                x_change = 5
+                player.right()
+            if event.key == pygame.K_UP:
+                player.up()
+            if event.key == pygame.K_DOWN:
+                player.down()
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
-                x_change = 0
-            if event.key == pygame.K_RIGHT:
-                x_change = 0
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                player.x_change = 0
+            if event.key == pygame.K_DOWN or event.key == pygame.K_UP:
+                player.y_change = 0
 
-
+    
     gameDisplay.fill((255, 255, 255))
-    if check(x+x_change,y):
-        x += x_change
-    display_person(x,y,100,100)
-    pygame.display.update()
+    sprites.update()
+    sprites.draw(gameDisplay)
     clock.tick(60)
+    pygame.display.update()
 
 pygame.quit()
 quit()
