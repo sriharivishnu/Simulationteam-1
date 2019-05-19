@@ -8,7 +8,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([100, 100], pygame.SRCALPHA)
-        pygame.draw.rect(self.image, (200, 200, 69), [0, 0, 100, 100])
+        #pygame.draw.rect(self.image, (200, 200, 69), [0, 0, 100, 100])
+        pygame.draw.circle(self.image, (200,200,69), [50,50],50)
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect()
         self.rect.center = position
@@ -29,6 +30,12 @@ class Player(pygame.sprite.Sprite):
             self.xvel = MAX_VELOCITY
         if self.yvel > MAX_VELOCITY:
             self.yvel = MAX_VELOCITY
+
+    def bouncex(self):
+        self.xvel = -self.xvel/2
+
+    def bouncey(self):
+        self.yvel = -self.yvel/2
 
     def move_right(self):
         self.angle = 0
@@ -135,13 +142,14 @@ while not crashed:
 
     # Apply the thrust, or rotation according to which key was pressed
     position = player1.get_position()
+    print (position)
     if 50 <= position[0] + player1.xvel <= WIDTH:
         if left:
             player1.move_left()
         if right:
             player1.move_right()
     else:
-        player1.xvel = 0
+        player1.bouncex()
 
     if 50 <= position[1] + player1.yvel <= HEIGHT-50:
         if forward:
@@ -150,7 +158,7 @@ while not crashed:
         if down:
             player1.move_down()
     else:
-        player1.yvel = 0
+        player1.bouncey()
 
     position[0] = min(max(position[0], 50), WIDTH)
     position[1] = min(max(position[1],50), HEIGHT-50)
