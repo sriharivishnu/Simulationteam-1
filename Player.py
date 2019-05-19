@@ -4,6 +4,7 @@ import math
 
 # Spaceship class to define players
 class Player(pygame.sprite.Sprite):
+    FRICTION = 0.75
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([100, 100], pygame.SRCALPHA)
@@ -65,21 +66,21 @@ class Player(pygame.sprite.Sprite):
         # Set the rect center to the new position
         self.rect.center = self.position
 
-        # Decrease velocity every frame by the deceleration of the surface as long as its
+        # Decrease velocity every frame by the friction of the surface as long as its
         # greater than 0
         if -1<self.xvel<1:
             self.xvel = 0
         elif self.xvel >= 1:
-            self.xvel -= FRICTION
+            self.xvel -= self.FRICTION
         else:
-            self.xvel += FRICTION
+            self.xvel += self.FRICTION
 
         if -1<self.yvel < 1:
             self.yvel = 0
         elif self.yvel >= 1:
-            self.yvel -= FRICTION
+            self.yvel -= self.FRICTION
         else:
-            self.yvel += FRICTION
+            self.yvel += self.FRICTION
 
 WIDTH = 500
 HEIGHT = 500
@@ -87,7 +88,6 @@ MAX_VELOCITY = 10
 ACCELERATION = 1
 ANGLE_ACCELERATION = 1
 MAX_ANGLE_VELOCITY = 5
-FRICTION = 0.75
 white = (255, 255, 255)
 
 pygame.init()
