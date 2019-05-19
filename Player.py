@@ -5,6 +5,8 @@ import math
 # Spaceship class to define players
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
+    MAX_VELOCITY = 10
+    ACCELERATION = 1
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([100, 100], pygame.SRCALPHA)
@@ -21,15 +23,15 @@ class Player(pygame.sprite.Sprite):
     # Accelerate forward in the direction the ship is facing
     def thrust(self):
         # Calculate the horizontal component of velocity
-        self.xvel = self.xvel + ACCELERATION * math.cos(math.radians(self.angle))
+        self.xvel = self.xvel + self.ACCELERATION * math.cos(math.radians(self.angle))
         # Calculate the vertical component of velocity
-        self.yvel = self.yvel + ACCELERATION * math.sin(math.radians(self.angle))
+        self.yvel = self.yvel + self.ACCELERATION * math.sin(math.radians(self.angle))
 
         # Make sure the velocity doesn't go above the max velocity
-        if self.xvel > MAX_VELOCITY:
-            self.xvel = MAX_VELOCITY
-        if self.yvel > MAX_VELOCITY:
-            self.yvel = MAX_VELOCITY
+        if self.xvel > self.MAX_VELOCITY:
+            self.xvel = self.MAX_VELOCITY
+        if self.yvel > self.MAX_VELOCITY:
+            self.yvel = self.MAX_VELOCITY
 
     def bouncex(self):
         self.xvel = -self.xvel/2
@@ -91,10 +93,7 @@ class Player(pygame.sprite.Sprite):
 
 WIDTH = 500
 HEIGHT = 500
-MAX_VELOCITY = 10
-ACCELERATION = 1
-ANGLE_ACCELERATION = 1
-MAX_ANGLE_VELOCITY = 5
+
 white = (255, 255, 255)
 
 pygame.init()
