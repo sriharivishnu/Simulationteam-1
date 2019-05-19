@@ -1,5 +1,5 @@
 import pygame, pygame.gfxdraw, random, math
-# Player class to define players
+# Spaceship class to define players
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
     MAX_VELOCITY = 10
@@ -89,7 +89,7 @@ class Player(pygame.sprite.Sprite):
             self.yvel += self.FRICTION
 
 WIDTH = 800
-HEIGHT = 800
+HEIGHT = 500
 pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 center = [400, 400]
@@ -139,13 +139,13 @@ while bruh==True:
             if event.key == pygame.K_d:
                 right = False
 
-    wall = pygame.draw.rect(screen, (0, 0, 0), [400 - 100, 50, 100, 100])
+    wall = pygame.draw.rect(screen, (0, 0, 0), [300, 50, 100, 100])
     wall1 = pygame.draw.rect(screen, (0, 0, 0), [300, 200, 50, 50])
     position = player.get_position()
     if player.rect.colliderect(wall) or player.rect.colliderect(wall1):
         player.bouncex()
         player.bouncey()
-    if 50 <= position[0] + player.xvel <= WIDTH:
+    if player.rect[2]/2 <= position[0] + player.xvel <= WIDTH-player.rect[2]/2:
         if left:
             player.move_left()
         if right:
@@ -153,7 +153,7 @@ while bruh==True:
     else:
         player.bouncex()
 
-    if 50 <= position[1] + player.yvel <= HEIGHT - 50:
+    if player.rect[3]/2 <= position[1] + player.yvel <= HEIGHT - player.rect[3]/2:
         if forward:
             player.move_up()
 
@@ -164,8 +164,8 @@ while bruh==True:
 
 
 
-    position[0] = min(max(position[0], 50), WIDTH)
-    position[1] = min(max(position[1], 50), HEIGHT - 50)
+    position[0] = min(max(position[0], player.rect[2]/2), WIDTH-player.rect[2]/2)
+    position[1] = min(max(position[1], player.rect[3]/2), HEIGHT - player.rect[3]/2)
     player.set_position(position[0], position[1])
     center = position
     screen.fill((0, 0, 0))
