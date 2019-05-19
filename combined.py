@@ -1,5 +1,5 @@
 import pygame, pygame.gfxdraw, random, math
-# Spaceship class to define players
+# Player class to define players
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
     MAX_VELOCITY = 10
