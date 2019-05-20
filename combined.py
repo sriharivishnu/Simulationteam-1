@@ -10,8 +10,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([50, 50], pygame.SRCALPHA)
-        # pygame.draw.rect(self.image, (200, 200, 69), [0, 0, 100, 100])
-        pygame.draw.circle(self.image, (200, 200, 69), [25, 25], 25)
+        pygame.draw.circle(self.image, (200, 10, 69), [25, 25], 25)
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect()
         self.rect.center = position
@@ -105,11 +104,12 @@ def calculate_angle(x1,y1,x2,y2):
 
 def get_light(center, angle, walls):
     pointlist = [center]
+    hit = False
     for x in range(-30, 31):
-        currenttargetangle = angle + x
+        current = angle + x
         hit = False
-        targetposy = center[1] + (2 * math.sin(math.radians(currenttargetangle)) * targetdist)
-        targetposx = center[0] + (2 * math.cos(math.radians(currenttargetangle)) * targetdist)
+        targetposy = center[1] + (2 * math.sin(math.radians(current)) * targetdist)
+        targetposx = center[0] + (2 * math.cos(math.radians(current)) * targetdist)
         xdisp = (targetposx - center[0]) / targetdist
         ydisp = (targetposy - center[1]) / targetdist
         for y in range(targetdist):
@@ -135,19 +135,19 @@ player = Player([400, 400])
 sprites.add(player)
 targetdist = 100
 targetangle = 260
-hit = False
-bruh = True
+crashed = False
 forward = False
 left = False
 right = False
 down = False
+brightness = 180
 clock = pygame.time.Clock()
 walls = [pygame.Rect(300, 50, 100, 100), pygame.Rect(300, 200, 50, 50)]
-while bruh == True:
+while not crashed:
     # print (targetangle)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            bruh = False
+            bruh = True
         if event.type == pygame.MOUSEMOTION:
             mouse_position = event.pos
         if event.type == pygame.KEYDOWN:
@@ -160,6 +160,10 @@ while bruh == True:
                 left = True
             if event.key == pygame.K_d:
                 right = True
+            if event.key == pygame.K_UP:
+                brightness += 10
+            if event.key == pygame.K_DOWN:
+                brightness -= 10
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
@@ -200,8 +204,10 @@ while bruh == True:
     if new_angle:
         targetangle = new_angle
     screen.fill((0, 0, 0))
+    box_surface_fill = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
     pointlist = get_light(position, targetangle, walls)
-    pygame.gfxdraw.filled_polygon(screen, pointlist, (255, 255, 0))
+    pygame.draw.polygon(box_surface_fill, (255, 255, 100, min(brightness,255)), pointlist)
+    screen.blit(box_surface_fill, (0,0))
     sprites.update()
     sprites.draw(screen)
     pygame.display.flip()
