@@ -5,7 +5,7 @@ import pygame, pygame.gfxdraw, random, math
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
     MAX_VELOCITY = 10
-    ACCELERATION = 2
+    ACCELERATION = 1
 
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
@@ -151,7 +151,7 @@ while not crashed:
     # print (targetangle)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            bruh = True
+            crashed = True
         if event.type == pygame.MOUSEMOTION:
             mouse_position = event.pos
         if event.type == pygame.KEYDOWN:
