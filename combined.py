@@ -5,7 +5,7 @@ import pygame, pygame.gfxdraw, random, math
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
     MAX_VELOCITY = 10
-    ACCELERATION = 1
+    ACCELERATION = 2
 
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
@@ -30,8 +30,12 @@ class Player(pygame.sprite.Sprite):
         # Make sure the velocity doesn't go above the max velocity
         if self.xvel > self.MAX_VELOCITY:
             self.xvel = self.MAX_VELOCITY
+        if self.xvel < -self.MAX_VELOCITY:
+            self.xvel = -self.MAX_VELOCITY
         if self.yvel > self.MAX_VELOCITY:
             self.yvel = self.MAX_VELOCITY
+        if self.yvel < -self.MAX_VELOCITY:
+            self.yvel = -self.MAX_VELOCITY
 
     def bouncex(self):
         self.xvel = -self.xvel / 2
