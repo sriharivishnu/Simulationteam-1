@@ -102,6 +102,28 @@ def calculate_angle(x1,y1,x2,y2):
             angle += 180
         return angle
     return None
+
+def get_light(center, angle, walls):
+    pointlist = [center]
+    for x in range(-30, 31):
+        currenttargetangle = angle + x
+        hit = False
+        targetposy = center[1] + (2 * math.sin(math.radians(currenttargetangle)) * targetdist)
+        targetposx = center[0] + (2 * math.cos(math.radians(currenttargetangle)) * targetdist)
+        xdisp = (targetposx - center[0]) / targetdist
+        ydisp = (targetposy - center[1]) / targetdist
+        for y in range(targetdist):
+            for wall in walls:
+                if wall.collidepoint((center[0] + xdisp * y), (center[1] + ydisp * y)):
+                    pointlist.append(((center[0] + xdisp * y), (center[1] + ydisp * y)))
+                    hit = True
+                    break
+            if hit:
+                break
+
+        if not hit:
+            pointlist.append((targetposx, targetposy))
+    return pointlist
 WIDTH = 800
 HEIGHT = 500
 pygame.init()
@@ -120,7 +142,7 @@ left = False
 right = False
 down = False
 clock = pygame.time.Clock()
-
+walls = [pygame.Rect(300, 50, 100, 100), pygame.Rect(300, 200, 50, 50)]
 while bruh == True:
     # print (targetangle)
     for event in pygame.event.get():
@@ -149,12 +171,12 @@ while bruh == True:
             if event.key == pygame.K_d:
                 right = False
 
-    wall = pygame.draw.rect(screen, (0, 0, 0), [300, 50, 100, 100])
-    wall1 = pygame.draw.rect(screen, (0, 0, 0), [300, 200, 50, 50])
+
     position = player.get_position()
-    if player.rect.colliderect(wall) or player.rect.colliderect(wall1):
-        player.bouncex()
-        player.bouncey()
+    for wall in walls:
+        if player.rect.colliderect(wall):
+            player.bouncex()
+            player.bouncey()
     if player.rect[2] / 2 <= position[0] + player.xvel <= WIDTH - player.rect[2] / 2:
         if left:
             player.move_left()
@@ -171,33 +193,14 @@ while bruh == True:
             player.move_down()
     else:
         player.bouncey()
-
     position[0] = min(max(position[0], player.rect[2] / 2), WIDTH - player.rect[2] / 2)
     position[1] = min(max(position[1], player.rect[3] / 2), HEIGHT - player.rect[3] / 2)
     player.set_position(position[0], position[1])
-    center = position
-    new_angle = calculate_angle(mouse_position[0], mouse_position[1], center[0], center[1])
+    new_angle = calculate_angle(mouse_position[0], mouse_position[1], position[0], position[1])
     if new_angle:
         targetangle = new_angle
     screen.fill((0, 0, 0))
-    pointlist = [center]
-    for x in range(-30, 31):
-        y = targetangle + x
-        hit = False
-        currenttargetangle = targetangle + x
-        targetposy = center[1] + (2 * math.sin(math.radians(y)) * targetdist)
-        targetposx = center[0] + (2 * math.cos(math.radians(y)) * targetdist)
-
-        xdisp = (targetposx - center[0]) / targetdist
-        ydisp = (targetposy - center[1]) / targetdist
-        for y in range(targetdist):
-            if wall.collidepoint((center[0] + xdisp * y), (center[1] + ydisp * y)) or wall1.collidepoint(
-                    (center[0] + xdisp * y), (center[1] + ydisp * y)):
-                pointlist.append(((center[0] + xdisp * y), (center[1] + ydisp * y)))
-                hit = True
-                break
-        if hit != True:
-            pointlist.append((targetposx, targetposy))
+    pointlist = get_light(position, targetangle, walls)
     pygame.gfxdraw.filled_polygon(screen, pointlist, (255, 255, 0))
     sprites.update()
     sprites.draw(screen)
