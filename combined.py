@@ -5,7 +5,7 @@ import pygame, pygame.gfxdraw, random, math
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
     MAX_VELOCITY = 10
-    ACCELERATION = 1
+    ACCELERATION = 1.5
 
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
@@ -48,7 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.thrust()
 
     def move_up(self):
-        self.angle = 90
+        self.angle = 270
         self.thrust()
 
     def move_left(self):
@@ -56,7 +56,7 @@ class Player(pygame.sprite.Sprite):
         self.thrust()
 
     def move_down(self):
-        self.angle = 270
+        self.angle = 90
         self.thrust()
 
     def get_position(self):
@@ -70,8 +70,8 @@ class Player(pygame.sprite.Sprite):
         addx = self.xvel
         addy = -self.yvel
 
-        self.position[0] += addx
-        self.position[1] += addy
+        # self.position[0] += addx
+        # self.position[1] += addy
 
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         # Get new rect object
@@ -179,38 +179,49 @@ while not crashed:
             if event.key == pygame.K_d:
                 right = False
 
-
+    if left:
+        player.move_left()
+    if right:
+        player.move_right()
+    if forward:
+        player.move_up()
+    if down:
+        player.move_down()
     position = player.get_position()
+    collides = False
+    new_rect = pygame.Rect(position[0] + player.xvel - player.rect[2]/2, position[1] + player.yvel - player.rect[3]/2, player.rect[2], player.rect[3])
     for wall in walls:
-        if player.rect.colliderect(wall):
-            player.bouncex()
-            player.bouncey()
+        if new_rect.colliderect(wall):
+            collides = True
     if player.rect[2] / 2 <= position[0] + player.xvel <= WIDTH - player.rect[2] / 2:
-        if left:
-            player.move_left()
-        if right:
-            player.move_right()
+        if not collides:
+            player.position[0] += player.xvel
+        else:
+            player.bouncex()
     else:
         player.bouncex()
 
-    if player.rect[3] / 2 <= position[1] + player.yvel <= HEIGHT - player.rect[3] / 2:
-        if forward:
-            player.move_up()
 
-        if down:
-            player.move_down()
+    if player.rect[3] / 2 <= position[1] + player.yvel <= HEIGHT - player.rect[3] / 2:
+        if not collides:
+            player.position[1] += player.yvel
+        else:
+            player.bouncey()
     else:
         player.bouncey()
+
     position[0] = min(max(position[0], player.rect[2] / 2), WIDTH - player.rect[2] / 2)
     position[1] = min(max(position[1], player.rect[3] / 2), HEIGHT - player.rect[3] / 2)
     player.set_position(position[0], position[1])
+
     new_angle = calculate_angle(mouse_position[0], mouse_position[1], position[0], position[1])
     if new_angle:
         targetangle = new_angle
+
     screen.fill((0, 0, 0))
     box_surface_fill = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
     pointlist = get_light(position, targetangle, walls)
-    pygame.draw.polygon(box_surface_fill, (255, 255, 100, min(brightness,255)), pointlist)
+    pygame.draw.polygon(box_surface_fill, (255, 255, 100, max(0,min(brightness,255))), pointlist)
     screen.blit(box_surface_fill, (0,0))
     sprites.update()
     sprites.draw(screen)
