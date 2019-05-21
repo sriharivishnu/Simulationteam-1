@@ -108,9 +108,8 @@ def calculate_angle(x1,y1,x2,y2):
 
 def get_light(center, angle, walls):
     pointlist = [center]
-    hit = False
-    for x in range(-30, 31):
-        current = angle + x
+    for x in range(-60, 61):
+        current = angle + x/2
         hit = False
         targetposy = center[1] + (2 * math.sin(math.radians(current)) * targetdist)
         targetposx = center[0] + (2 * math.cos(math.radians(current)) * targetdist)
