@@ -1,7 +1,7 @@
 import pygame, pygame.gfxdraw, random, math
 
 
-# Spaceship class to define players
+# Player class to define players
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
     MAX_VELOCITY = 10
@@ -20,7 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         self.deceleration = True
 
-    # Accelerate forward in the direction the ship is facing
+    # Accelerate forward in the direction the player is facing
     def thrust(self):
         # Calculate the horizontal component of velocity
         self.xvel = self.xvel + self.ACCELERATION * math.cos(math.radians(self.angle))
