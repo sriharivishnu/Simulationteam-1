@@ -1,5 +1,5 @@
 import pygame, pygame.gfxdraw, random, math
-
+WIDTH_LIGHT=30
 
 # Player class to define players
 class Player(pygame.sprite.Sprite):
@@ -108,8 +108,8 @@ def calculate_angle(x1,y1,x2,y2):
 
 def get_light(center, angle, walls):
     pointlist = [center]
-    for x in range(-60, 61):
-        current = angle + x/2
+    for x in range(-1*WIDTH_LIGHT, WIDTH_LIGHT+1):
+        current = angle + x
         hit = False
         targetposy = center[1] + (2 * math.sin(math.radians(current)) * targetdist)
         targetposx = center[0] + (2 * math.cos(math.radians(current)) * targetdist)
@@ -145,7 +145,9 @@ right = False
 down = False
 brightness = 180
 clock = pygame.time.Clock()
-walls = [pygame.Rect(300, 50, 100, 100), pygame.Rect(300, 200, 50, 50)]
+walls = []
+for x in range(3):
+    walls.append(pygame.Rect(random.randint(50, WIDTH-50), random.randint(50, HEIGHT-50), 50, 50))
 while not crashed:
     # print (targetangle)
     for event in pygame.event.get():
