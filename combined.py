@@ -1,7 +1,7 @@
 import pygame, pygame.gfxdraw, random, math
 WIDTH_LIGHT=30
 
-# Player class to define players
+# Spaceship class to define players
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
     MAX_VELOCITY = 10
@@ -10,7 +10,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([50, 50], pygame.SRCALPHA)
-        pygame.draw.circle(self.image, (200, 10, 69), [25, 25], 25)
+        pygame.gfxdraw.aacircle(self.image, 25, 25, 25, (200,10,69))
+        pygame.gfxdraw.filled_circle(self.image, 25, 25, 25, (200,10,69))
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect()
         self.rect.center = position
@@ -20,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         self.deceleration = True
 
-    # Accelerate forward in the direction the player is facing
+    # Accelerate forward in the direction the ship is facing
     def thrust(self):
         # Calculate the horizontal component of velocity
         self.xvel = self.xvel + self.ACCELERATION * math.cos(math.radians(self.angle))
@@ -67,11 +68,6 @@ class Player(pygame.sprite.Sprite):
 
     # Called every frame
     def update(self, *args):
-        addx = self.xvel
-        addy = -self.yvel
-
-        # self.position[0] += addx
-        # self.position[1] += addy
 
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         # Get new rect object
@@ -127,6 +123,7 @@ def get_light(center, angle, walls):
         if not hit:
             pointlist.append((targetposx, targetposy))
     return pointlist
+
 WIDTH = 800
 HEIGHT = 500
 pygame.init()
@@ -222,7 +219,8 @@ while not crashed:
     screen.fill((0, 0, 0))
     box_surface_fill = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
     pointlist = get_light(position, targetangle, walls)
-    pygame.draw.polygon(box_surface_fill, (255, 255, 100, max(0,min(brightness,255))), pointlist)
+    pygame.gfxdraw.aapolygon(box_surface_fill, pointlist, (255, 255, 100, max(0,min(brightness,255))))
+    pygame.gfxdraw.filled_polygon(box_surface_fill, pointlist, (255, 255, 100, max(0,min(brightness,255))))
     screen.blit(box_surface_fill, (0,0))
     sprites.update()
     sprites.draw(screen)
