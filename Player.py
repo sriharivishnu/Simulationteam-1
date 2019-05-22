@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
 
     def bouncey(self):
         self.yvel = -self.yvel/2
-
+        
     def move_right(self):
         self.angle = 0
         self.thrust()
