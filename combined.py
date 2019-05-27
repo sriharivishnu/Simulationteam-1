@@ -1,19 +1,20 @@
 import pygame, pygame.gfxdraw, random, math
 WIDTH_LIGHT=30
+MAX_DISTANCE = 100
 
-# Spaceship class to define players
+# Player class to define players
 class Player(pygame.sprite.Sprite):
     FRICTION = 0.75
-    MAX_VELOCITY = 10
+    MAX_VELOCITY = 5
     ACCELERATION = 1.5
 
-    def __init__(self, position):
+    def __init__(self, position, width):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface([50, 50], pygame.SRCALPHA)
-        pygame.gfxdraw.aacircle(self.image, 25, 25, 25, (200,10,69))
-        pygame.gfxdraw.filled_circle(self.image, 25, 25, 25, (200,10,69))
+        self.image = pygame.Surface([width, width], pygame.SRCALPHA)
+        pygame.draw.circle(self.image, (200, 10, 69), [width//2, width//2], width//2)
         self.original_image = self.image.copy()
         self.rect = self.image.get_rect()
+        self.width = width
         self.rect.center = position
         self.xvel = 0
         self.yvel = 0
@@ -21,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         self.deceleration = True
 
-    # Accelerate forward in the direction the ship is facing
+    # Accelerate forward in the direction the player is facing
     def thrust(self):
         # Calculate the horizontal component of velocity
         self.xvel = self.xvel + self.ACCELERATION * math.cos(math.radians(self.angle))
@@ -107,11 +108,11 @@ def get_light(center, angle, walls):
     for x in range(-1*WIDTH_LIGHT, WIDTH_LIGHT+1):
         current = angle + x
         hit = False
-        targetposy = center[1] + (2 * math.sin(math.radians(current)) * targetdist)
-        targetposx = center[0] + (2 * math.cos(math.radians(current)) * targetdist)
-        xdisp = (targetposx - center[0]) / targetdist
-        ydisp = (targetposy - center[1]) / targetdist
-        for y in range(targetdist):
+        targetposy = center[1] + (2 * math.sin(math.radians(current)) * MAX_DISTANCE)
+        targetposx = center[0] + (2 * math.cos(math.radians(current)) * MAX_DISTANCE)
+        xdisp = (targetposx - center[0]) / MAX_DISTANCE
+        ydisp = (targetposy - center[1]) / MAX_DISTANCE
+        for y in range(MAX_DISTANCE):
             for wall in walls:
                 if wall.collidepoint((center[0] + xdisp * y), (center[1] + ydisp * y)):
                     pointlist.append(((center[0] + xdisp * y), (center[1] + ydisp * y)))
@@ -124,16 +125,51 @@ def get_light(center, angle, walls):
             pointlist.append((targetposx, targetposy))
     return pointlist
 
-WIDTH = 800
-HEIGHT = 500
+def check_collisions():
+    collides = False
+    new_rect = pygame.Rect(position[0] + player.xvel - player.rect[2] / 2,
+                           position[1] + player.yvel - player.rect[3] / 2, player.rect[2], player.rect[3])
+    for wall in walls:
+        if new_rect.colliderect(wall):
+            collides = True
+    if player.rect[2] / 2 <= position[0] + player.xvel <= WIDTH - player.rect[2] / 2:
+        if not collides:
+            player.position[0] += player.xvel
+        else:
+            player.bouncex()
+    else:
+        player.bouncex()
+
+    if player.rect[3] / 2 <= position[1] + player.yvel <= HEIGHT - player.rect[3] / 2:
+        if not collides:
+            player.position[1] += player.yvel
+        else:
+            player.bouncey()
+    else:
+        player.bouncey()
+
+def draw_screen():
+    screen.fill((255, 255, 255))
+    for wall in walls:
+        pygame.draw.rect(screen, (0,0,0), wall)
+    box_surface_fill = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    pointlist = get_light(position, targetangle, walls)
+    pygame.draw.polygon(box_surface_fill, (255, 255, 100, max(0, min(brightness, 255))), pointlist)
+    screen.blit(box_surface_fill, (0, 0))
+    sprites.update()
+    sprites.draw(screen)
+    pygame.display.flip()
+
+WIDTH = 1250
+HEIGHT = 950
 pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 center = [WIDTH/2, HEIGHT/2]
 mouse_position = center
 sprites = pygame.sprite.Group()
-player = Player([400, 400])
+player = Player([400, 400], 20)
 sprites.add(player)
-targetdist = 100
+
 targetangle = 260
 crashed = False
 forward = False
@@ -185,29 +221,9 @@ while not crashed:
         player.move_up()
     if down:
         player.move_down()
+
     position = player.get_position()
-    collides = False
-    new_rect = pygame.Rect(position[0] + player.xvel - player.rect[2]/2, position[1] + player.yvel - player.rect[3]/2, player.rect[2], player.rect[3])
-    for wall in walls:
-        if new_rect.colliderect(wall):
-            collides = True
-    if player.rect[2] / 2 <= position[0] + player.xvel <= WIDTH - player.rect[2] / 2:
-        if not collides:
-            player.position[0] += player.xvel
-        else:
-            player.bouncex()
-    else:
-        player.bouncex()
-
-
-    if player.rect[3] / 2 <= position[1] + player.yvel <= HEIGHT - player.rect[3] / 2:
-        if not collides:
-            player.position[1] += player.yvel
-        else:
-            player.bouncey()
-    else:
-        player.bouncey()
-
+    check_collisions()
     position[0] = min(max(position[0], player.rect[2] / 2), WIDTH - player.rect[2] / 2)
     position[1] = min(max(position[1], player.rect[3] / 2), HEIGHT - player.rect[3] / 2)
     player.set_position(position[0], position[1])
@@ -216,13 +232,5 @@ while not crashed:
     if new_angle:
         targetangle = new_angle
 
-    screen.fill((0, 0, 0))
-    box_surface_fill = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-    pointlist = get_light(position, targetangle, walls)
-    pygame.gfxdraw.aapolygon(box_surface_fill, pointlist, (255, 255, 100, max(0,min(brightness,255))))
-    pygame.gfxdraw.filled_polygon(box_surface_fill, pointlist, (255, 255, 100, max(0,min(brightness,255))))
-    screen.blit(box_surface_fill, (0,0))
-    sprites.update()
-    sprites.draw(screen)
-    pygame.display.flip()
-    clock.tick(30)
+    draw_screen()
+    clock.tick(60)
