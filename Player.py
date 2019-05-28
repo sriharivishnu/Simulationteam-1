@@ -59,6 +59,16 @@ class Player(pygame.sprite.Sprite):
         self.angle = 90
         self.thrust()
 
+    def move(self, left, right, up, down):
+        if left:
+            self.move_left()
+        if right:
+            self.move_right()
+        if up:
+            self.move_up()
+        if down:
+            self.move_down()
+
     def get_position(self):
         return self.position
 
