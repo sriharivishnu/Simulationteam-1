@@ -1,7 +1,9 @@
 import pygame, pygame.gfxdraw, random, math
 from Player import *
-WIDTH_LIGHT=30
+from Map import *
+WIDTH_LIGHT = 30
 MAX_DISTANCE = 100
+FPS = 60
 
 def calculate_angle(x1,y1,x2,y2):
     if x1 - x2 != 0:
@@ -23,8 +25,8 @@ def get_light(center, angle, walls):
         xdisp = (targetposx - center[0]) / MAX_DISTANCE
         ydisp = (targetposy - center[1]) / MAX_DISTANCE
         for y in range(MAX_DISTANCE):
-            for wall in walls:
-                if wall.collidepoint((center[0] + xdisp * y), (center[1] + ydisp * y)):
+            for wall in walls_sprites:
+                if wall.rect.collidepoint((center[0] + xdisp * y), (center[1] + ydisp * y)):
                     pointlist.append(((center[0] + xdisp * y), (center[1] + ydisp * y)))
                     hit = True
                     break
@@ -35,11 +37,12 @@ def get_light(center, angle, walls):
             pointlist.append((targetposx, targetposy))
     return pointlist
 
+
 def check_collisions():
     collides = False
     new_rect = pygame.Rect(position[0] + player.xvel - player.rect[2] / 2,
                            position[1] + player.yvel - player.rect[3] / 2, player.rect[2], player.rect[3])
-    for wall in walls:
+    for wall in walls_sprites:
         if new_rect.colliderect(wall):
             collides = True
     if player.rect[2] / 2 <= position[0] + player.xvel <= WIDTH - player.rect[2] / 2:
@@ -58,16 +61,17 @@ def check_collisions():
     else:
         player.bouncey()
 
+
 def draw_screen():
     screen.fill((255, 255, 255))
-    for wall in walls:
-        pygame.draw.rect(screen, (0,0,0), wall)
     box_surface_fill = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-    pointlist = get_light(position, targetangle, walls)
-    pygame.draw.polygon(box_surface_fill, (255, 255, 100, max(0, min(brightness, 255))), pointlist)
+    #pointlist = get_light(position, targetangle, walls)
+    #pygame.draw.polygon(box_surface_fill, (255, 255, 100, max(0, min(brightness, 255))), pointlist)
     screen.blit(box_surface_fill, (0, 0))
     sprites.update()
+    walls_sprites.update()
     sprites.draw(screen)
+    walls_sprites.draw(screen)
     pygame.display.flip()
 
 # WIDTH = 1250
@@ -76,10 +80,21 @@ WIDTH = 500
 HEIGHT = 500
 pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
+
+walls = []
+map = Map()
+
 center = [WIDTH/2, HEIGHT/2]
 mouse_position = center
 sprites = pygame.sprite.Group()
-player = Player([400, 400], 20)
+walls_sprites = pygame.sprite.Group()
+
+for y, tiles in enumerate(map.map_data):
+    for x, tile in enumerate(tiles):
+        if tile == "#":
+            Wall(x,y,32, 32, walls_sprites)
+
+player = Player([400, 300], 20)
 sprites.add(player)
 
 targetangle = 260
@@ -90,9 +105,7 @@ right = False
 down = False
 brightness = 180
 clock = pygame.time.Clock()
-walls = []
-for x in range(3):
-    walls.append(pygame.Rect(random.randint(50, WIDTH-50), random.randint(50, HEIGHT-50), 50, 50))
+
 while not crashed:
     # print (targetangle)
     for event in pygame.event.get():
@@ -125,14 +138,7 @@ while not crashed:
             if event.key == pygame.K_d:
                 right = False
 
-    if left:
-        player.move_left()
-    if right:
-        player.move_right()
-    if forward:
-        player.move_up()
-    if down:
-        player.move_down()
+    player.move(left, right, forward, down)
 
     position = player.get_position()
     check_collisions()
@@ -145,4 +151,4 @@ while not crashed:
         targetangle = new_angle
 
     draw_screen()
-    clock.tick(60)
+    clock.tick(FPS)
