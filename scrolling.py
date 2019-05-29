@@ -43,7 +43,7 @@ def check_collisions():
     new_rect = pygame.Rect(position[0] + player.xvel - player.rect[2] / 2,
                            position[1] + player.yvel - player.rect[3] / 2, player.rect[2], player.rect[3])
     for wall in walls_sprites:
-        if new_rect.colliderect(wall):
+        if new_rect.colliderect(wall.rect):
             collides = True
     if player.rect[2] / 2 <= position[0] + player.xvel <= WIDTH - player.rect[2] / 2:
         if not collides:
@@ -73,6 +73,8 @@ def draw_screen():
         screen.blit(sprite.image, camera.apply(sprite))
     for wall in walls_sprites:
         screen.blit(wall.image, camera.apply(wall))
+
+    walls_sprites.draw(screen)
     pygame.display.flip()
     camera.update(player, WIDTH, HEIGHT)
 
@@ -150,7 +152,7 @@ while not crashed:
     position[1] = min(max(position[1], player.rect[3] / 2), HEIGHT - player.rect[3] / 2)
     player.set_position(position[0], position[1])
 
-    new_angle = calculate_angle(mouse_position[0], mouse_position[1], position[0], position[1])
+    new_angle = calculate_angle(mouse_position[0], mouse_position[1], WIDTH//2, HEIGHT//2)
     if new_angle:
         targetangle = new_angle
 
