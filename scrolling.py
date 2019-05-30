@@ -65,10 +65,10 @@ def draw_screen():
     sprites.update()
     walls_sprites.update()
     for sprite in sprites:
-        screen.blit(sprite.image, camera.apply(sprite))
+        sprite.rect = camera.apply(sprite)
     for wall in walls_sprites:
-        screen.blit(wall.image, camera.apply(wall))
-
+        wall.rect = camera.apply(wall)
+        print (camera.apply(wall))
     walls_sprites.draw(screen)
     pygame.display.flip()
     camera.update(player, WIDTH, HEIGHT)
