@@ -2,12 +2,38 @@ import pygame, pygame.gfxdraw, random, math
 
 pygame.init()
 screen = pygame.display.set_mode([800, 800])
-center = (400, 200)
+center = (400, 400)
 targetdist = 100
 targetangle = 260
 hit=False
 bruh=True
 clock = pygame.time.Clock()
+
+class wall(pygame.sprite.Sprite):
+    def __init__(self,width, height,position):
+        pygame.sprite.Sprite.__init__()
+        self.positionx=position[0]
+        self.positiony=position[1]
+        self.width=width
+        self.height=height
+        self.rect =pygame.draw.rect(screen, (255,255,255), (position[0], position[1], width, height), width=0)
+    def cameramove(self,left,right,up,down):
+        if left:
+            self.positionx-=10
+        elif right:
+            self.positionx+=10
+        if up:
+            self.positiony-=10
+        elif down:
+            self.positiony+=10
+        self.rect = pygame.draw.rect(screen, (255, 255, 255), (self.positionx, self.positiony, self.width, self.height), width=0)
+
+
+
+wallist=[wall(30,30,100,100),wall(30,30,200,200)]
+
+
+
 while bruh==True:
     #print (targetangle)
     for event in pygame.event.get():
@@ -21,6 +47,28 @@ while bruh==True:
                 if x > 0 and y < 0 or x < 0 and y < 0:
                     targetangle += 180
             print (targetangle)
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_w:
+                forward = True
+            if event.key == pygame.K_s:
+                down = True
+            if event.key == pygame.K_a:
+                left = True
+            if event.key == pygame.K_d:
+                right = True
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_w:
+                forward = False
+            if event.key == pygame.K_s:
+                down = False
+            if event.key == pygame.K_a:
+                left = False
+            if event.key == pygame.K_d:
+                right = False
+    for x in range(wallist):
+        wallist[x].cameramove(left,right,forward,down)
     screen.fill((0, 0, 0))
     pointlist = [center]
     for x in range(-30, 31):
@@ -32,13 +80,12 @@ while bruh==True:
 
         xdisp=(targetposx-center[0])/targetdist
         ydisp = (targetposy - center[1]) / targetdist
-        wall = pygame.draw.rect(screen, (255, 0, 0), [400 - 100, 50, 100, 100])
-        wall1 = pygame.draw.rect(screen, (255, 0, 0), [300, 200, 50, 50])
+
         for y in range(targetdist):
-            if wall.collidepoint((center[0]+xdisp*y),(center[1]+ydisp*y)) or wall1.collidepoint((center[0]+xdisp*y),(center[1]+ydisp*y)):
-                pointlist.append(((center[0]+xdisp*y), (center[1]+ydisp*y)))
-                hit=True
-                break
+            for z in range(len(wallist)):
+                if wallist[z].collidepoint((center[0]+xdisp*y),(center[1]+ydisp*y)):
+                    hit=True
+                    break
         if hit!=True:
             pointlist.append((targetposx, targetposy))
     pygame.gfxdraw.filled_polygon(screen,pointlist,(255,255,0))
