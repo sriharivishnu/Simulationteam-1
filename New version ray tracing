@@ -35,7 +35,7 @@ class wall(pygame.sprite.Sprite):
 wallist=[]
 wallist.append(wall(100,100,(100,100)))
 wallist.append(wall(100,100,(200,200)))
-
+wallslength=len(wallist)
 
 while bruh==True:
     for event in pygame.event.get():
@@ -83,7 +83,7 @@ while bruh==True:
         ydisp = (targetposy - center[1]) / targetdist
 
         for y in range(targetdist):
-            for z in range(len(wallist)):
+            for z in range(wallslength):
                 if wallist[z].rect.collidepoint((center[0]+xdisp*y),(center[1]+ydisp*y)):
                     pointlist.append(((center[0] + xdisp * y), (center[1] + ydisp * y)))
                     hit=True
