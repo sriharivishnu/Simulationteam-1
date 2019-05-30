@@ -45,19 +45,14 @@ def check_collisions():
     for wall in walls_sprites:
         if new_rect.colliderect(wall.rect):
             collides = True
-    if player.rect[2] / 2 <= position[0] + player.xvel <= WIDTH - player.rect[2] / 2:
-        if not collides:
-            player.position[0] += player.xvel
-        else:
-            player.bouncex()
+
+    if not collides:
+        player.position[0] += player.xvel
     else:
         player.bouncex()
 
-    if player.rect[3] / 2 <= position[1] + player.yvel <= HEIGHT - player.rect[3] / 2:
-        if not collides:
-            player.position[1] += player.yvel
-        else:
-            player.bouncey()
+    if not collides:
+        player.position[1] += player.yvel
     else:
         player.bouncey()
 
@@ -148,8 +143,6 @@ while not crashed:
     position = player.get_position()
     pointlist = get_light([WIDTH/2, HEIGHT/2], targetangle, walls)
     check_collisions()
-    position[0] = min(max(position[0], player.rect[2] / 2), WIDTH - player.rect[2] / 2)
-    position[1] = min(max(position[1], player.rect[3] / 2), HEIGHT - player.rect[3] / 2)
     player.set_position(position[0], position[1])
 
     new_angle = calculate_angle(mouse_position[0], mouse_position[1], WIDTH//2, HEIGHT//2)
