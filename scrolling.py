@@ -76,10 +76,10 @@ def draw_screen():
     pygame.display.flip()
 
 
-WIDTH = 1250
-HEIGHT = 950
-#WIDTH = 500
-#HEIGHT = 500
+# WIDTH = 1250
+# HEIGHT = 950
+WIDTH = 500
+HEIGHT = 500
 pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 
@@ -144,7 +144,7 @@ while not crashed:
     player.move(left, right, forward, down)
 
     position = player.get_position()
-    pointlist = get_light([WIDTH/2, HEIGHT/2], targetangle, walls)
+    pointlist = get_light([WIDTH/2 + player.width/2, HEIGHT/2 + player.width/2], targetangle, walls)
     check_collisions()
     player.set_position(position[0], position[1])
 
