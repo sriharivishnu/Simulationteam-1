@@ -15,7 +15,7 @@ def calculate_angle(x1,y1,x2,y2):
         return angle
     return None
 
-def get_light(center, angle, walls):
+def get_light(center, angle):
     pointlist = [center]
     for x in range(-1*WIDTH_LIGHT, WIDTH_LIGHT+1):
         current = angle + x
@@ -25,7 +25,7 @@ def get_light(center, angle, walls):
         xdisp = (targetposx - center[0]) / MAX_DISTANCE
         ydisp = (targetposy - center[1]) / MAX_DISTANCE
         for y in range(MAX_DISTANCE):
-            for wall in walls_sprites:
+            for wall in renderlist:
                 if camera.apply(wall).collidepoint((center[0] + xdisp * y), (center[1] + ydisp * y)):
                     pointlist.append(((center[0] + xdisp * y), (center[1] + ydisp * y)))
                     hit = True
@@ -40,21 +40,18 @@ def get_light(center, angle, walls):
 
 def check_collisions():
     collides = False
-    new_rect = pygame.Rect(position[0] + player.xvel - player.rect[2] / 2,
-                           position[1] + player.yvel - player.rect[3] / 2, player.rect[2], player.rect[3])
-    for wall in walls_sprites:
+    new_rect = pygame.Rect(position[0] + player.xvel - player.rect.width / 2, position[1] + player.yvel - player.rect.height / 2, player.rect.width, player.rect.height)
+    for wall in renderlist:
         if new_rect.colliderect(wall):
             collides = True
 
     if not collides:
         player.position[0] += player.xvel
-        #camera.camera.x -= player.xvel
     else:
         player.bouncex()
 
     if not collides:
         player.position[1] += player.yvel
-        #camera.camera.y -= player.yvel
     else:
         player.bouncey()
 
@@ -73,6 +70,8 @@ def draw_screen():
     for wall in walls_sprites:
         screen.blit(wall.image, camera.apply(wall))
 
+    #pygame.draw.circle(screen, (125, 124, 200), [WIDTH//2 + player.width//2, HEIGHT//2 + player.width//2], MAX_DISTANCE*2)
+    pygame.draw.rect(screen, (125, 124, 200), render, 1)
     pygame.display.flip()
 
 
@@ -89,6 +88,7 @@ map = Map()
 center = [WIDTH/2, HEIGHT/2]
 mouse_position = center
 sprites = pygame.sprite.Group()
+renderlist = pygame.sprite.Group()
 walls_sprites = pygame.sprite.Group()
 
 for y, tiles in enumerate(map.map_data):
@@ -98,7 +98,7 @@ for y, tiles in enumerate(map.map_data):
 
 player = Player([WIDTH/2, HEIGHT/2], 20)
 sprites.add(player)
-
+render = pygame.Rect(WIDTH/2 - MAX_DISTANCE * 2, HEIGHT/2 - MAX_DISTANCE * 2, MAX_DISTANCE * 4,MAX_DISTANCE * 4)
 camera = Camera(WIDTH, HEIGHT)
 targetangle = 260
 crashed = False
@@ -110,7 +110,7 @@ brightness = 180
 clock = pygame.time.Clock()
 
 while not crashed:
-    # print (targetangle)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             crashed = True
@@ -141,14 +141,21 @@ while not crashed:
             if event.key == pygame.K_d:
                 right = False
 
+
     player.move(left, right, forward, down)
 
     position = player.get_position()
-    pointlist = get_light([WIDTH/2 + player.width/2, HEIGHT/2 + player.width/2], targetangle, walls)
+    actual = camera.apply(player)
+    pointlist = get_light([actual.x + player.width//2, actual.y + player.width//2], targetangle)
     check_collisions()
-    player.set_position(position[0], position[1])
+    render.center = actual.center
 
-    new_angle = calculate_angle(mouse_position[0], mouse_position[1], WIDTH/2 + player.width, HEIGHT/2 + player.width)
+    for sprite in walls_sprites:
+        if render.contains(camera.apply(sprite)):
+            renderlist.add(sprite)
+        else:
+            renderlist.remove(sprite)
+    new_angle = calculate_angle(mouse_position[0], mouse_position[1], actual.x + player.width, actual.y + player.width)
     if new_angle:
         targetangle = new_angle
 
