@@ -70,7 +70,6 @@ def draw_screen():
     for wall in walls_sprites:
         screen.blit(wall.image, camera.apply(wall))
 
-    #pygame.draw.circle(screen, (125, 124, 200), [WIDTH//2 + player.width//2, HEIGHT//2 + player.width//2], MAX_DISTANCE*2)
     pygame.draw.rect(screen, (125, 124, 200), render, 1)
     pygame.display.flip()
 
@@ -95,6 +94,11 @@ for y, tiles in enumerate(map.map_data):
     for x, tile in enumerate(tiles):
         if tile == "#":
             Wall(x*32, y*32, 32, 32, walls_sprites)
+
+Wall(0, 0, 32*32,32, walls_sprites)
+Wall(0,0, 32, 32*32, walls_sprites)
+Wall(32*31, 0, 32, 32*32, walls_sprites)
+Wall(0, 32*31, 32*32, 32, walls_sprites)
 
 player = Player([WIDTH/2, HEIGHT/2], 20)
 sprites.add(player)
@@ -151,7 +155,7 @@ while not crashed:
     render.center = actual.center
 
     for sprite in walls_sprites:
-        if render.contains(camera.apply(sprite)):
+        if render.colliderect(camera.apply(sprite)):
             renderlist.add(sprite)
         else:
             renderlist.remove(sprite)
