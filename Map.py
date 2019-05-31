@@ -21,7 +21,7 @@ class Map:
 
 class Camera:
     def __init__(self, width, height):
-        self.camera = pygame.Rect(0,0, width*32, height*32)
+        self.camera = pygame.Rect(0,0, width, height)
         self.width = width
         self.height = height
 
@@ -33,6 +33,6 @@ class Camera:
         x = -target.rect.x + screenw //2
         y = -target.rect.y + screenh // 2
 
-        x = max(min(0,x), - (self.width + 32))
-        y = max(min(0,y), -(self.height + 32))
+        x = max(min(0,x), - (32*32 - screenw))
+        y = max(min(0,y), - (32*32 - screenh))
         self.camera = pygame.Rect(x,y, self.width, self.height)
