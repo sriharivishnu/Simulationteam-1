@@ -30,9 +30,9 @@ class Camera:
         return new_rect
 
     def update(self, target, screenw, screenh):
-        x = -target.rect.x + screenw //2
+        x = -target.rect.x + screenw // 4
         y = -target.rect.y + screenh // 2
 
-        x = max(min(0,x), - (32*32 - screenw))
+        x = max(min(0,x), - (32*32 - screenw//2))
         y = max(min(0,y), - (32*32 - screenh))
         self.camera = pygame.Rect(x,y, self.width, self.height)
