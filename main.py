@@ -24,7 +24,7 @@ def get_light(center, angle):
         targetposx = center[0] + (2 * math.cos(math.radians(current)) * MAX_DISTANCE)
         xdisp = (targetposx - center[0]) / MAX_DISTANCE
         ydisp = (targetposy - center[1]) / MAX_DISTANCE
-        for y in range(MAX_DISTANCE):
+        for y in range(0, MAX_DISTANCE, 2):
             for wall in renderlist:
                 if camera.apply(wall).collidepoint((center[0] + xdisp * y), (center[1] + ydisp * y)):
                     pointlist.append(((center[0] + xdisp * y), (center[1] + ydisp * y)))
@@ -57,27 +57,29 @@ def check_collisions():
 
 
 def draw_screen():
-    screen.fill((255, 255, 255))
+    screen.fill((255,255,255))
     box_surface_fill = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    player1surface.fill((255, 255, 255))
     pygame.draw.polygon(box_surface_fill, (255, 255, 100, max(0, min(brightness, 255))), pointlist)
-    screen.blit(box_surface_fill, (0, 0))
+    player1surface.blit(box_surface_fill, (0, 0))
     sprites.update()
     walls_sprites.update()
     camera.update(player, WIDTH, HEIGHT)
     for sprite in sprites:
-        screen.blit(sprite.image, camera.apply(sprite))
+        player1surface.blit(sprite.image, camera.apply(sprite))
 
     for wall in walls_sprites:
-        screen.blit(wall.image, camera.apply(wall))
-
+        player1surface.blit(wall.image, camera.apply(wall))
+    screen.blit(player1surface,(0,0))
     pygame.draw.rect(screen, (125, 124, 200), render, 1)
     pygame.display.flip()
 
 
 # WIDTH = 1250
 # HEIGHT = 950
-WIDTH = 500
+WIDTH = 1000
 HEIGHT = 500
+player1surface=pygame.Surface([WIDTH/2,HEIGHT])
 pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 
@@ -165,3 +167,4 @@ while not crashed:
 
     draw_screen()
     clock.tick(FPS)
+    print(clock.get_fps())
