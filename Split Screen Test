@@ -140,7 +140,7 @@ class Player(pygame.sprite.Sprite):
 
 WIDTH_LIGHT = 30
 MAX_DISTANCE = 100
-FPS = 60
+FPS = 40
 
 def calculate_angle(x1,y1,x2,y2):
     if x1 - x2 != 0:
@@ -251,7 +251,7 @@ right = False
 down = False
 brightness = 180
 clock = pygame.time.Clock()
-
+actual = camera.apply(player)
 while not crashed:
 
     for event in pygame.event.get():
@@ -289,14 +289,29 @@ while not crashed:
 
     position = player.get_position()
     actual = camera.apply(player)
+    try:
+        changex=0
+        changey=0
+        targetposy1 = actual.y + (2 * math.sin(math.radians(new_angle + -1 * WIDTH_LIGHT)) * (MAX_DISTANCE+20))
+        targetposx1 = actual.x + (2 * math.cos(math.radians(new_angle + -1 * WIDTH_LIGHT)) * (MAX_DISTANCE+20))
+        targetposx2 = actual.x + (2 * math.cos(math.radians(new_angle + WIDTH_LIGHT)) * (MAX_DISTANCE+20))
+        targetposy2 = actual.y + (2 * math.sin(math.radians(new_angle + WIDTH_LIGHT)) * (MAX_DISTANCE+20))
+        maxx = max(targetposx1, targetposx2, actual.x)
+        miny = min(targetposy1, targetposy2, actual.y)
+        minx = min(targetposx1, targetposx2, actual.x)
+        maxy = max(targetposy1, targetposy2, actual.y)
+        diffx=minx - maxx
+        diffy=maxy - miny
+        render = pygame.Rect(maxx+changex, miny+changey,(diffx), (diffy))
+    except:
+        pass
     pointlist = get_light([actual.x + player.width//2, actual.y + player.width//2], targetangle)
     check_collisions()
-    render.center = actual.center
-
-    for sprite in walls_sprites:
+    for sprite in walls_sprites:#For some reason is not coliding with the box?
         if render.colliderect(camera.apply(sprite)):
-            renderlist.add(sprite)
+            renderlist.add(sprite)#also have to add a second hitbox behind player so they can run into walls
         else:
+            print("Not Working")
             renderlist.remove(sprite)
     new_angle = calculate_angle(mouse_position[0], mouse_position[1], actual.x + player.width, actual.y + player.width)
     if new_angle:
@@ -304,4 +319,3 @@ while not crashed:
 
     draw_screen()
     clock.tick(FPS)
-    print(clock.get_fps())
